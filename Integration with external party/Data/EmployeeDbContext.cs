@@ -1,12 +1,13 @@
-﻿using IntegrationWithExternalParty.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-public class EmployeeDbContext : DbContext
+namespace IntegrationWithExternalParty.Models
 {
-    public EmployeeDbContext(DbContextOptions<EmployeeDbContext> options)
-        : base(options)
+    public class EmployeeDbContext : DbContext
     {
-    }
+        public EmployeeDbContext(DbContextOptions<EmployeeDbContext> options) : base(options)
+        {
+        }
 
-    public DbSet<Employee> Employees { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+    }
 }

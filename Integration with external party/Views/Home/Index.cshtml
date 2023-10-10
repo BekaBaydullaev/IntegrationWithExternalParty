@@ -1,8 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IntegrationWithExternalParty.Models.CsvUploadViewModel
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Section 1: File Upload and Import Button -->
+<div></div>
+<form asp-controller="Home" asp-action="ImportData" method="post" enctype="multipart/form-data" class="mb-4">
+    <div class="form-group">
+        <label>Upload CSV File:</label>
+        <input type="file" name="CsvFile" required />
+    </div>
+    <input type="submit" value="Import" class="btn btn-primary" />
+</form>
+<div></div>
+<!-- Display the number of records processed -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+<!-- Section 2: Data Display -->
+@if (Model.CsvData != null && Model.CsvData.Any())
+{
+    <table id="csvDataTable" class="display mt-4">
+        <thead>
+            <tr>
+                <th>Payroll Number</th>
+                <th>Fore Names</th>
+                <th>Surname</th>
+                <th>Date Of Birth</th>
+                <th>Telephone</th>
+                <th>Mobile</th>
+                <th>Address</th>
+                <th>Address2</th>
+                <th>Postcode</th>
+                <th>Email Home</th>
+                <th>Start Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.CsvData)
+            {
+                <tr>
+                    <td>@row.PayrollNumber</td>
+                    <td>@row.Forenames</td>
+                    <td>@row.Surname</td>
+                    <td>@row.DateOfBirth</td>
+                    <td>@row.Telephone</td>
+                    <td>@row.Mobile</td>
+                    <td>@row.Address</td>
+                    <td>@row.Address2</td>
+                    <td>@row.Postcode</td>
+                    <td>@row.EmailHome</td>
+                    <td>@row.StartDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+}
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#csvDataTable').DataTable();
+            "order": [[2, 'asc']]  // Sort by third column (Surname) ascending
+        });
+    </script>
+}
