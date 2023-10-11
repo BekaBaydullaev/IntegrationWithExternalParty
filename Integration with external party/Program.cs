@@ -21,7 +21,7 @@ builder.Host.UseSerilog();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<EmployeeDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Server=tcp:ingreationwithexternalpartyserver.database.windows.net,1433;Initial Catalog=IntergrationWithExternalPartyDB;Persist Security Info=False;User ID=bekab123;Password=950bw.=T<9qS;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Azure")));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

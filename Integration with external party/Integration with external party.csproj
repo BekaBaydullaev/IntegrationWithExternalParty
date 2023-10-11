@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>IntegrationWithExternalParty</RootNamespace>
+    <UserSecretsId>05f4019d-4722-49af-a597-52c03c9f2454</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
