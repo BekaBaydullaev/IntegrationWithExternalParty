@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using Integration_with_external_party.Models;
 using IntegrationWithExternalParty.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -18,12 +19,15 @@ namespace Integration_with_external_party.Controllers
             public bool HasError { get; set; }
             public string ErrorMessage { get; set; }
         }
+        // Constructor to initialize logger and database context.
         public HomeController(ILogger<HomeController> logger, EmployeeDbContext context)
         {
             _logger = logger;
             _context = context;
         }
 
+        // The main action that displays the home page.
+        // If data was recently loaded from a CSV, it will fetch and show that data.
         public IActionResult Index()
         {
             var model = new CsvUploadViewModel();
@@ -40,6 +44,7 @@ namespace Integration_with_external_party.Controllers
             return View(model);
         }
 
+        // Action to handle the upload and processing of a CSV file.
         [HttpPost]
         public async Task<IActionResult> ImportData(CsvUploadViewModel model)
         {
@@ -90,6 +95,8 @@ namespace Integration_with_external_party.Controllers
 
 
         }
+        // A helper method to process the uploaded CSV file.
+        // Reads the file, parses its content, and saves the data to the database.
         private async Task<FileProcessResult> ProcessCsvFile(IFormFile file)
         {
             var result = new FileProcessResult();
@@ -135,7 +142,69 @@ namespace Integration_with_external_party.Controllers
 
             return result;
         }
+        [HttpPost]
+        public IActionResult SaveEditedData(EditEmployeeData editedData)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Fetch the existing record from the database using the Id.
+                    var existingEmployee = _context.Employees.FirstOrDefault(e => e.Id == editedData.Id);
 
+                    if (existingEmployee != null)
+                    {
+                        // Update the properties of the existing record with the edited data.
+                        existingEmployee.PayrollNumber = editedData.PayrollNumber;
+                        existingEmployee.Forenames = editedData.Forenames;
+                        existingEmployee.Surname = editedData.Surname;
+                        existingEmployee.DateOfBirth = editedData.DateOfBirth;
+                        existingEmployee.Telephone = editedData.Telephone;
+                        existingEmployee.Mobile = editedData.Mobile;
+                        existingEmployee.Address = editedData.Address;
+                        existingEmployee.Address2 = editedData.Address2;
+                        existingEmployee.Postcode = editedData.Postcode;
+                        existingEmployee.EmailHome = editedData.EmailHome;
+                        existingEmployee.StartDate = editedData.StartDate;
+                        
+
+                        // Save changes to the database.
+                        _context.SaveChanges();
+
+                        return Json(new { success = true, message = "Data updated successfully!" });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Employee not found." });
+                    }
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    // Handle database update exceptions
+                    _logger.LogError(dbEx, "Failed to update employee data in the database.");
+                    return Json(new { success = false, message = "Database error occurred. Please try again later." });
+                }
+                catch (ArgumentNullException argNullEx)
+                {
+                    // Handle specific exceptions if you expect them
+                    _logger.LogError(argNullEx, "A null argument was passed where it wasn't expected.");
+                    return Json(new { success = false, message = "Invalid data provided. Please check and try again." });
+                }
+                catch (Exception ex)
+                {
+                    // Handle other general exceptions
+                    _logger.LogError(ex, "An unexpected error occurred while saving edited data.");
+                    return Json(new { success = false, message = "An unexpected error occurred. Please try again later." });
+                }
+            }
+            else
+            {
+                // The received data did not pass model validation.
+                return Json(new { success = false, message = "Invalid data provided." });
+            }
+        }
+    
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
