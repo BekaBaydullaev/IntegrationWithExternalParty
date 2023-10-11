@@ -1,19 +1,19 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
-using System;
-using System.Globalization;
+﻿    using CsvHelper;
+    using CsvHelper.Configuration;
+    using CsvHelper.TypeConversion;
+    using System;
+    using System.Globalization;
 
-public class CustomDateTimeConverter : DateTimeConverter
-{
-    public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+    public class CustomDateTimeConverter : DateTimeConverter
     {
-        string[] formats = { "dd/MM/yyyy", "d/M/yyyy", "yyyy/MM/dd", "yyyy/M/d", "MM/dd/yyyy", "M/d/yyyy" };
-
-        if (DateTime.TryParseExact(text, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+        public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
         {
-            return date;
+            string[] formats = { "dd/MM/yyyy", "d/M/yyyy", "yyyy/MM/dd", "yyyy/M/d", "MM/dd/yyyy", "M/d/yyyy", "dd.MM.yyyy", "d.M.yyyy", "d.m.yyyy", "yyyy.mm.dd" };
+
+            if (DateTime.TryParseExact(text, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            {
+                return date;
+            }
+            return base.ConvertFromString(text, row, memberMapData);
         }
-        return base.ConvertFromString(text, row, memberMapData);
     }
-}
